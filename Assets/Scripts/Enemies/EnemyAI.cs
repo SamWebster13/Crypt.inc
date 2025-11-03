@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyChaseWithGround : MonoBehaviour
+public class Enemy : MonoBehaviour
 {
+    [Header("References")]
     public NavMeshAgent agent;
     public Transform player;
 
@@ -31,47 +32,83 @@ public class EnemyChaseWithGround : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        // Snap to NavMesh if slightly above or below
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, 2f, NavMesh.AllAreas))
+        {
+            agent.Warp(hit.position);
+        }
+    }
+
     private void Update()
     {
         if (player == null || agent == null)
             return;
 
-        // Check ground
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, whatIsGround);
+        // Ground Check
+        Vector3 checkPos = transform.position + Vector3.down * 0.5f;
+        isGrounded = Physics.CheckSphere(checkPos, 0.5f, whatIsGround);
 
-        // Optional visual debug
+        // Debug 
+        Color rayColor = isGrounded ? Color.green : Color.red;
+        Debug.DrawRay(transform.position, Vector3.down * groundCheckDistance, rayColor);
+
+
+        // ground check
         Debug.DrawRay(transform.position, Vector3.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
 
-        // Make sure the agent is on NavMesh and on the ground
-        if (!agent.isOnNavMesh || !isGrounded)
-            return;
+        if (!isGrounded)
+        {
+            Debug.LogWarning($"{name} is NOT grounded! Ground layer mask: {whatIsGround.value}");
+        }
 
-        // Check if player is within detection range
+
+        if (!agent.isOnNavMesh)
+        {
+            Debug.LogWarning($"{name} is NOT on NavMesh!");
+            return;
+        }
+
+        //Player Detection 
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
 
         if (playerInSightRange)
         {
             ChasePlayer();
+            Debug.Log($"{name} → Player detected! Chasing {player.name}");
         }
         else
         {
-            // Stop moving when player is out of range
             agent.ResetPath();
+            Debug.Log($"{name} → Player not in range, idle");
         }
     }
 
     private void ChasePlayer()
     {
-        // Move toward the player
-        agent.SetDestination(player.position);
+        if (agent.isActiveAndEnabled && agent.isOnNavMesh)
+        {
+            agent.SetDestination(player.position);
+        }
     }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = isGrounded ? Color.green : Color.red;
+        Vector3 checkPos = transform.position + Vector3.down * 0.5f;
+        Gizmos.DrawWireSphere(checkPos, 0.5f);
+    }
+
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.yellow;
+        // Sight range gizmo
+        Gizmos.color = playerInSightRange ? Color.red : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, sightRange);
 
-        Gizmos.color = Color.green;
+        // Ground check line
+        Gizmos.color = isGrounded ? Color.green : Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * groundCheckDistance);
     }
 }
