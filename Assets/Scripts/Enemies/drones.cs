@@ -8,10 +8,10 @@ public class HunterAI : MonoBehaviour
     public NavMeshAgent agent;
 
     [Header("Detection Settings")]
-    public string enemyTag = "Enemy";         // What tag the hunter looks for
+    public string enemyTag = "Enemy";         
     public LayerMask whatIsGround;
-    public float detectionRange = 15f;        // How far it can detect enemies
-    public float attackRange = 2f;            // How close it must be to kill
+    public float detectionRange = 15f;        
+    public float attackRange = 2f;            
     public float groundCheckDistance = 2f;
 
     private Transform currentTarget;
@@ -24,7 +24,7 @@ public class HunterAI : MonoBehaviour
 
     private void Start()
     {
-        // Snap to NavMesh if slightly above or below
+       
         NavMeshHit hit;
         if (NavMesh.SamplePosition(transform.position, out hit, 2f, NavMesh.AllAreas))
         {
@@ -34,7 +34,7 @@ public class HunterAI : MonoBehaviour
 
     private void Update()
     {
-        // --- Ground Check ---
+        
         Vector3 checkPos = transform.position + Vector3.down * 0.5f;
         isGrounded = Physics.CheckSphere(checkPos, 0.5f, whatIsGround);
 
@@ -52,19 +52,19 @@ public class HunterAI : MonoBehaviour
             return;
         }
 
-        // --- Find Nearest Enemy ---
+        
         currentTarget = FindNearestEnemy();
 
         if (currentTarget != null)
         {
             float distance = Vector3.Distance(transform.position, currentTarget.position);
 
-            // Move toward target
+            
             agent.SetDestination(currentTarget.position);
 
             Debug.Log($"{name} → Targeting {currentTarget.name}, Distance: {distance:F2}");
 
-            // Attack / Kill if close enough
+            
             if (distance <= attackRange)
             {
                 KillEnemy(currentTarget.gameObject);
@@ -102,7 +102,7 @@ public class HunterAI : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // Ground check sphere
+        
         Gizmos.color = isGrounded ? Color.green : Color.red;
         Vector3 checkPos = transform.position + Vector3.down * 0.5f;
         Gizmos.DrawWireSphere(checkPos, 0.5f);
@@ -110,11 +110,11 @@ public class HunterAI : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        // Detection range
+        
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
-        // Attack range
+        
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
