@@ -6,65 +6,63 @@ public class HunterAI : MonoBehaviour
 {
     [Header("References")]
     public NavMeshAgent agent;
+    private Rigidbody rb;
 
     [Header("Detection Settings")]
-    public string enemyTag = "Enemy";         
+    public string enemyTag = "Enemy";
+    public float detectionRange = 15f;
+    public float attackRange = 2f;
+
+    [Header("Gravity Settings")]
+    public float gravity = -9.81f;     // gravity strength
+    public float groundCheckDistance = 0.5f;
     public LayerMask whatIsGround;
-    public float detectionRange = 15f;        
-    public float attackRange = 2f;            
-    public float groundCheckDistance = 2f;
 
     private Transform currentTarget;
     private bool isGrounded;
+    private Vector3 velocity;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-    }
+        rb = GetComponent<Rigidbody>();
 
-    private void Start()
-    {
-       
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(transform.position, out hit, 2f, NavMesh.AllAreas))
+        // Add Rigidbody if missing
+        if (rb == null)
         {
-            agent.Warp(hit.position);
+            rb = gameObject.AddComponent<Rigidbody>();
         }
+
+        // Configure Rigidbody so NavMeshAgent can still work
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+        rb.useGravity = false; // we'll apply gravity manually
     }
 
     private void Update()
     {
-        
-        Vector3 checkPos = transform.position + Vector3.down * 0.5f;
-        isGrounded = Physics.CheckSphere(checkPos, 0.5f, whatIsGround);
+        GroundCheck();
 
-        Debug.DrawRay(transform.position, Vector3.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
-
+        // Apply gravity if not grounded
         if (!isGrounded)
         {
-            Debug.LogWarning($"{name} is NOT grounded!");
-            return;
+            velocity.y += gravity * Time.deltaTime;
+            rb.MovePosition(transform.position + velocity * Time.deltaTime);
+        }
+        else
+        {
+            velocity.y = 0f;
         }
 
         if (!agent.isOnNavMesh)
-        {
-            Debug.LogWarning($"{name} is NOT on NavMesh!");
             return;
-        }
 
-        
         currentTarget = FindNearestEnemy();
 
         if (currentTarget != null)
         {
             float distance = Vector3.Distance(transform.position, currentTarget.position);
-
-            
             agent.SetDestination(currentTarget.position);
 
-            Debug.Log($"{name} → Targeting {currentTarget.name}, Distance: {distance:F2}");
-
-            
             if (distance <= attackRange)
             {
                 KillEnemy(currentTarget.gameObject);
@@ -73,8 +71,15 @@ public class HunterAI : MonoBehaviour
         else
         {
             agent.ResetPath();
-            Debug.Log($"{name} → No enemies in range");
         }
+
+        // Keep agent and Rigidbody synced
+        agent.nextPosition = transform.position;
+    }
+
+    private void GroundCheck()
+    {
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, whatIsGround);
     }
 
     private Transform FindNearestEnemy()
@@ -88,33 +93,18 @@ public class HunterAI : MonoBehaviour
             .FirstOrDefault();
 
         float distance = Vector3.Distance(transform.position, nearest.transform.position);
-        if (distance <= detectionRange)
-            return nearest.transform;
-        else
-            return null;
+        return distance <= detectionRange ? nearest.transform : null;
     }
 
     private void KillEnemy(GameObject enemy)
     {
-        Debug.Log($"{name} → Killed {enemy.name}!");
         Destroy(enemy);
-    }
-
-    private void OnDrawGizmos()
-    {
-        
-        Gizmos.color = isGrounded ? Color.green : Color.red;
-        Vector3 checkPos = transform.position + Vector3.down * 0.5f;
-        Gizmos.DrawWireSphere(checkPos, 0.5f);
     }
 
     private void OnDrawGizmosSelected()
     {
-        
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-
-        
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
