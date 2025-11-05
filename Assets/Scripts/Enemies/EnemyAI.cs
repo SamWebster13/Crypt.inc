@@ -1,16 +1,23 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(Collider))]
 public class Enemy : MonoBehaviour
 {
     [Header("References")]
     public NavMeshAgent agent;
     public Transform player;
+    private PlayerHealth playerHealth;
 
     [Header("Detection Settings")]
-    public float sightRange = 15f; 
+    public float sightRange = 15f;
+
+    [Header("Attack Settings")]
+    public int damageAmount = 10;        // how much damage to deal
+    public float attackCooldown = 1f;    // seconds between hits
 
     private bool playerInSightRange;
+    private float lastAttackTime;
 
     private void Awake()
     {
@@ -21,8 +28,15 @@ public class Enemy : MonoBehaviour
         {
             GameObject playerObj = GameObject.FindWithTag("Player");
             if (playerObj != null)
+            {
                 player = playerObj.transform;
+                playerHealth = playerObj.GetComponent<PlayerHealth>();
+            }
         }
+
+        // Make sure the collider is set up for triggering
+        Collider col = GetComponent<Collider>();
+        col.isTrigger = true;
     }
 
     private void Update()
@@ -39,7 +53,7 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            agent.ResetPath(); 
+            agent.ResetPath();
         }
     }
 
@@ -48,6 +62,22 @@ public class Enemy : MonoBehaviour
         if (agent.isActiveAndEnabled && agent.isOnNavMesh)
         {
             agent.SetDestination(player.position);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        // Check if we are touching the player
+        if (other.CompareTag("Player") && Time.time >= lastAttackTime + attackCooldown)
+        {
+            if (playerHealth == null)
+                playerHealth = other.GetComponent<PlayerHealth>();
+
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damageAmount);
+                lastAttackTime = Time.time;
+            }
         }
     }
 
