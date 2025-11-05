@@ -8,7 +8,7 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] GameObject creditsPanel;
 
     [Header("Scenes")]
-    [SerializeField] string gameSceneName = "SampleScene"; // change to your play scene name
+    [SerializeField] string gameSceneName = "Level 1"; // change to your play scene name
 
     public void StartGame() => SceneManager.LoadScene(gameSceneName);
 

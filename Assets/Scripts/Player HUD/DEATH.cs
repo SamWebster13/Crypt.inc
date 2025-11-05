@@ -9,7 +9,7 @@ public class DeathScreenUI : MonoBehaviour
     public GameObject hideWhenDeadRoot; 
 
     [Header("Scenes")]
-    public string gameSceneName = "SampleScene"; 
+    public string gameSceneName = "Level 1"; 
     public string mainMenuSceneName = "MainMenu"; 
 
     bool shown;
