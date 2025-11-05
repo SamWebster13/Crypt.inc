@@ -103,7 +103,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 257
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -220,7 +220,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.016666668
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: bff470e74c21f4e4b9d8326228d6ad7d, type: 2}
   m_BuildHeightMesh: 0
