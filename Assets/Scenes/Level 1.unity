@@ -1359,6 +1359,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3262344718198969811, guid: 13f1bbfd125248b4c810b59d11379543, type: 3}
+      propertyPath: crawlMultipler
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3262344718198969811, guid: 13f1bbfd125248b4c810b59d11379543, type: 3}
+      propertyPath: crouchMultipler
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3262344718198969811, guid: 13f1bbfd125248b4c810b59d11379543, type: 3}
+      propertyPath: sprintMultiplier
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
