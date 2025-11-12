@@ -4,20 +4,19 @@ using UnityEngine;
 public class DoorShield : MonoBehaviour
 {
     [Header("Visual")]
-    public Renderer shieldRenderer;  
+    public Renderer shieldRenderer;
     public Color greenColor = new Color(0f, 1f, 0f, 0.25f);
     public Color redColor = new Color(1f, 0f, 0f, 0.25f);
     public float emissionBoost = 1.5f;
 
     [Header("State")]
-    public bool startsOpen = true;  
+    public bool startsOpen = true;
     public bool IsOpen { get; private set; }
 
     BoxCollider col;
     MaterialPropertyBlock mpb;
     float baseAlpha = 0.25f;
 
-   
     static readonly int BaseColorID = Shader.PropertyToID("_BaseColor");
     static readonly int LegacyColorID = Shader.PropertyToID("_Color");
     static readonly int EmissionID = Shader.PropertyToID("_EmissionColor");
@@ -39,19 +38,14 @@ public class DoorShield : MonoBehaviour
         SetOpen(startsOpen);
     }
 
-    void OnValidate()
-    {
-        if (!col) col = GetComponent<BoxCollider>();
-        if (!shieldRenderer) shieldRenderer = GetComponent<Renderer>();
-    }
-
     public void Toggle() => SetOpen(!IsOpen);
 
     public void SetOpen(bool open)
     {
-        IsOpen = open;
-        col.isTrigger = open;
+        Debug.Log($"[DoorShield:{name}] SetOpen({open})", this);
 
+        IsOpen = open;
+        if (col) col.isTrigger = open;
         ApplyVisuals();
     }
 
@@ -60,13 +54,12 @@ public class DoorShield : MonoBehaviour
         if (!shieldRenderer) return;
 
         var c = IsOpen ? greenColor : redColor;
-        c.a = baseAlpha; 
+        c.a = baseAlpha;
 
         mpb.Clear();
         mpb.SetColor(BaseColorID, c);
         mpb.SetColor(LegacyColorID, c);
         mpb.SetColor(EmissionID, new Color(c.r, c.g, c.b) * emissionBoost);
-
         shieldRenderer.SetPropertyBlock(mpb);
     }
 }

@@ -1,32 +1,33 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-public class PowerGatedInteractable : MonoBehaviour, IInteractable, IPowerConsumer
+public class PowerGatedInteractable : MonoBehaviour, IInteractable
 {
-    public MonoBehaviour target; 
+    [Tooltip("Component that ALSO implements IInteractable (e.g. ShieldSwitch, TVPowerButton)")]
+    public MonoBehaviour target;
+
     IInteractable _i;
-    bool powered;
 
-    void Awake() { _i = target as IInteractable; }
-
-    void OnEnable()
+    void Awake()
     {
-        var mgr = PowerGridManager.Instance;
-        if (mgr != null)
+        _i = target as IInteractable;
+        if (_i == null)
         {
-            mgr.Register(this);      
-            powered = mgr.IsOn;     
+            //Debug.LogWarning($"{name}: PowerGatedInteractable target does NOT implement IInteractable!");
         }
     }
 
-    void OnDisable() => PowerGridManager.Instance?.Unregister(this);
-
-    public string Prompt => (_i != null) ? _i.Prompt : "";
+    public string Prompt => _i != null ? _i.Prompt : "";
 
     public void Interact(Transform interactor)
     {
-        if (!powered) return;        
-        _i?.Interact(interactor);
-    }
+        // Ask the global manager what the power state is RIGHT NOW
+        var mgr = PowerGridManager.Instance;
+        bool hasPower = (mgr == null) ? true : mgr.IsOn;
 
-    public void OnPowerChanged(bool isOn) { powered = isOn; }
+       // Debug.Log($"[PowerGate:{name}] Interact called. hasPower={hasPower}");
+
+        if (!hasPower) return;     // grid off → ignore click completely
+
+        _i?.Interact(interactor);  // forward to real button script (ShieldSwitch, TVPowerButton etc.)
+    }
 }

@@ -8,6 +8,15 @@ public class TVPowerButton : MonoBehaviour, IInteractable
 
     public void Interact(Transform interactor)
     {
+        // Failsafe: don’t toggle if grid is off
+        if (PowerGridManager.Instance && !PowerGridManager.Instance.IsOn)
+        {
+            Debug.Log("[TVPowerButton] Ignoring click, grid is OFF");
+            return;
+        }
+
         if (screen) screen.TogglePower();
     }
+
+
 }

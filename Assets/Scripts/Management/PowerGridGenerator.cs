@@ -1,7 +1,9 @@
+// PowerGridManager.cs
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-[DefaultExecutionOrder(-100)] 
+[DefaultExecutionOrder(-100)]
 public class PowerGridManager : MonoBehaviour
 {
     public static PowerGridManager Instance { get; private set; }
@@ -10,8 +12,12 @@ public class PowerGridManager : MonoBehaviour
     public float warmupSeconds = 1.0f;
 
     bool isOn;
-    public bool IsOn => isOn; 
+    public bool IsOn => isOn;
     Coroutine warmupCo;
+
+    [SerializeField] bool debugIsOn;   // just mirrors state in Inspector
+
+    readonly List<IPowerConsumer> consumers = new();
 
     void Awake()
     {
@@ -19,7 +25,20 @@ public class PowerGridManager : MonoBehaviour
         Instance = this;
     }
 
-    public void TogglePower() { if (isOn) TurnOff(); else TurnOn(); }
+    void SetPowerState(bool on)
+    {
+        isOn = on;
+        debugIsOn = on;
+        Debug.Log($"[PowerGrid] SetPowerState({on})");
+        NotifyAll(on);
+    }
+
+    public void TogglePower()
+    {
+        Debug.Log($"[PowerGrid] TogglePower pressed. Was {isOn}");
+        if (isOn) TurnOff();
+        else TurnOn();
+    }
 
     public void TurnOn()
     {
@@ -31,9 +50,8 @@ public class PowerGridManager : MonoBehaviour
     public void TurnOff()
     {
         if (warmupCo != null) { StopCoroutine(warmupCo); warmupCo = null; }
-        isOn = false;
-        PowerIndicator.SnapAll(false);
-        NotifyAll(false);
+        Debug.Log("[PowerGrid] TurnOff() called");
+        SetPowerState(false);
     }
 
     IEnumerator CoWarmup()
@@ -45,26 +63,48 @@ public class PowerGridManager : MonoBehaviour
             PowerIndicator.BroadcastWarmup(Mathf.Clamp01(t / warmupSeconds));
             yield return null;
         }
-        isOn = true;
-        warmupCo = null;
-        PowerIndicator.SnapAll(true);
-        NotifyAll(true);
-    }
 
-    // --- Registry of consumers ---
-    readonly System.Collections.Generic.List<IPowerConsumer> consumers = new();
+        warmupCo = null;
+        SetPowerState(true);
+    }
 
     public void Register(IPowerConsumer c)
     {
         if (c == null) return;
-        if (!consumers.Contains(c)) consumers.Add(c);
-        c.OnPowerChanged(isOn);             
+        if (!consumers.Contains(c))
+        {
+            consumers.Add(c);
+            Debug.Log($"[PowerGrid] Register {((MonoBehaviour)c).name}. Pushing current state {isOn}");
+            c.OnPowerChanged(isOn);
+        }
     }
 
-    public void Unregister(IPowerConsumer c) { consumers.Remove(c); }
+    public void Unregister(IPowerConsumer c)
+    {
+        if (c == null) return;
+        if (consumers.Remove(c))
+            Debug.Log($"[PowerGrid] Unregister {((MonoBehaviour)c).name}");
+    }
 
     void NotifyAll(bool on)
     {
-        for (int i = 0; i < consumers.Count; i++) consumers[i]?.OnPowerChanged(on);
+        Debug.Log($"[PowerGrid] NotifyAll({on}) to {consumers.Count} consumers");
+
+        for (int i = 0; i < consumers.Count; i++)
+        {
+            var c = consumers[i];
+            if (c == null)
+            {
+                Debug.Log($"[PowerGrid]   consumer index {i} is NULL");
+                continue;
+            }
+
+            var mb = c as MonoBehaviour;
+            string name = mb ? mb.name : c.GetType().Name;
+
+            Debug.Log($"[PowerGrid]   -> notifying {name} ({c.GetType().Name}) with {on}");
+            c.OnPowerChanged(on);
+        }
     }
+
 }

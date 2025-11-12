@@ -253,7 +253,7 @@ GameObject:
   - component: {fileID: 8321993091872617948}
   - component: {fileID: 6993609809961721920}
   - component: {fileID: 1896614428274416325}
-  - component: {fileID: 2233791341651013379}
+  - component: {fileID: 6787999303001782279}
   m_Layer: 0
   m_Name: door switch
   m_TagString: Untagged
@@ -367,7 +367,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoorSwitch
   prompt: Press E to toggle door
   shield: {fileID: 3957758372108585740}
---- !u!114 &2233791341651013379
+--- !u!114 &6787999303001782279
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -376,10 +376,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1662797504024578114}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85ce6b1dd3358e94b80751afdda8205e, type: 3}
+  m_Script: {fileID: 11500000, guid: d2d81ab5c522bc84f9ce91720c2e9116, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PowerGatedInteractable
+  m_EditorClassIdentifier: Assembly-CSharp::PoweredInteractable
   target: {fileID: 1896614428274416325}
+  debugHasPower: 0
+  controlsTV: 0
+  tv: {fileID: 0}
+  forceOffOnPowerLoss: 1
+  autoOnWhenPowerReturn: 0
+  controlsDoor: 1
+  door: {fileID: 3957758372108585740}
+  openWhenNoPower: 1
+  closeOnPowerReturn: 1
 --- !u!1 &2914808435970578375
 GameObject:
   m_ObjectHideFlags: 0
@@ -510,6 +519,7 @@ MonoBehaviour:
   onColor: {r: 1, g: 0.85, b: 0.2, a: 1}
   offColor: {r: 0.08, g: 0.08, b: 0.08, a: 1}
   emission: 2
+  logWarmup: 0
 --- !u!114 &4694847344922542888
 MonoBehaviour:
   m_ObjectHideFlags: 0
