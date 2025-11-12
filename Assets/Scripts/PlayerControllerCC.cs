@@ -6,13 +6,27 @@ public class PlayerControllerCC : MonoBehaviour
     [Header("Move")]
     public float moveSpeed = 6f;
     public float sprintMultiplier = 1.5f;
+    public float crouchMultiplier = 0.5f;
+    public float crouchHeight = 1f;
+    public float crawlMultiplier = 0.15f;
+    public float crawlHeight = 0.5f;
+    public float standHeight = 2f;
     public float jumpHeight = 1.5f;
     public float gravity = -20f;
+
+    private bool isCrouching = false;
+    private bool isCrawling = false;
 
     [Header("Mouse Look")]
     public Transform cam;
     public float mouseSensitivity = 1.2f;
     public float maxLookX = 85f;
+
+    [Header("Camera Positions")]
+    public Vector3 standCamPos = new Vector3(0, 0.9f, 0);
+    public Vector3 crouchCamPos = new Vector3(0, 0.6f, 0);
+    public Vector3 crawlCamPos = new Vector3(0, 0.3f, 0);
+    public float camLerpSpeed = 8f;
 
     [Header("Interaction")]
     public float interactDistance = 3f;
@@ -49,6 +63,7 @@ public class PlayerControllerCC : MonoBehaviour
         if (cam) cam.localRotation = Quaternion.Euler(rotX, 0f, 0f);
     }
 
+    // Movement with crouch and crawl
     void Move()
     {
         bool grounded = cc.isGrounded;
@@ -58,17 +73,62 @@ public class PlayerControllerCC : MonoBehaviour
         float z = Input.GetAxisRaw("Vertical");
         Vector3 input = (transform.right * x + transform.forward * z).normalized;
 
-        float speed = moveSpeed * (Input.GetKey(KeyCode.LeftShift) ? sprintMultiplier : 1f);
+        // Toggle crouch
+        if (Input.GetButtonDown("Crouch"))
+        {
+            isCrawling = false;
+            isCrouching = !isCrouching;
+            cc.height = isCrouching ? crouchHeight : standHeight;
+        }
+
+        // Toggle crawl
+        if (Input.GetButtonDown("Crawl"))
+        {
+            isCrouching = false;
+            isCrawling = !isCrawling;
+            cc.height = isCrawling ? crawlHeight : standHeight;
+        }
+
+        // Determine movement speed
+        float speed = moveSpeed;
+        if (Input.GetButton("Sprint") && !isCrouching && !isCrawling)
+            speed *= sprintMultiplier;
+        else if (isCrouching)
+            speed *= crouchMultiplier;
+        else if (isCrawling)
+            speed *= crawlMultiplier;
+
+        // Apply movement
         cc.Move(input * speed * Time.deltaTime);
 
-        if (grounded && Input.GetButtonDown("Jump"))
+        // Jump
+        if (grounded && Input.GetButtonDown("Jump") && !isCrawling)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
         velocity.y += gravity * Time.deltaTime;
         cc.Move(velocity * Time.deltaTime);
     }
 
-    // LEFT-CLICK to interact
+    void UpdateCameraHeight()
+    {
+        if (!cam) return;
+
+        // pick target camera position based on state
+        Vector3 targetCamPos = standCamPos;
+
+        if (isCrouching)
+            targetCamPos = crouchCamPos;
+        else if (isCrawling)
+            targetCamPos = crawlCamPos;
+
+        // smooth transition
+        cam.localPosition = Vector3.Lerp(
+            cam.localPosition,
+            targetCamPos,
+            Time.deltaTime * camLerpSpeed
+        );
+    }
+
     // LEFT-CLICK to interact
     void Interact()
     {
