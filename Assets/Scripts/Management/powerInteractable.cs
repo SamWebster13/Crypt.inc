@@ -26,39 +26,34 @@ public class PoweredInteractable : MonoBehaviour, IInteractable, IPowerConsumer
             Debug.LogWarning($"{name}: PoweredInteractable target does NOT implement IInteractable!", this);
     }
 
-    void Start()
+    // ✅ register here
+    void OnEnable()
     {
         var mgr = PowerGridManager.Instance;
         if (mgr != null)
         {
-            Debug.Log($"[PoweredInteractable:{name}] Registering with PowerGridManager", this);
-            mgr.Register(this);              // will immediately call OnPowerChanged(isOn)
-        }
-        else
-        {
-            Debug.LogWarning($"{name}: No PowerGridManager found at Start.", this);
+            Debug.Log($"[PoweredInteractable:{name}] OnEnable -> register");
+            mgr.Register(this);                 // pushes current state immediately
+            OnPowerChanged(mgr.IsOn);           // double-ensure local flag mirrors grid
         }
     }
 
     void OnDisable()
     {
+        Debug.Log($"[PoweredInteractable:{name}] OnDisable -> unregister");
         PowerGridManager.Instance?.Unregister(this);
     }
 
-    // -------- IPowerConsumer --------
     public void OnPowerChanged(bool isOn)
     {
         hasPower = isOn;
         debugHasPower = isOn;
-
         Debug.Log($"[PoweredInteractable:{name}] OnPowerChanged -> {isOn}", this);
 
         if (controlsTV && tv)
         {
-            if (!isOn && forceOffOnPowerLoss)
-                tv.SetPower(false);
-            else if (isOn && autoOnWhenPowerReturn)
-                tv.SetPower(true);
+            if (!isOn && forceOffOnPowerLoss) tv.SetPower(false);
+            else if (isOn && autoOnWhenPowerReturn) tv.SetPower(true);
         }
     }
 

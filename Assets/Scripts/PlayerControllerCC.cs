@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 
 // coconut
@@ -134,30 +134,53 @@ public class PlayerControllerCC : MonoBehaviour
     // LEFT-CLICK to interact
     void Interact()
     {
-        if (!cam) return;
+        if (!cam) { Debug.LogWarning("[Player] Camera reference is missing."); return; }
+
+        // only on click
+        if (!Input.GetMouseButtonDown(0)) return;
 
         Ray ray = new Ray(cam.position, cam.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactMask, QueryTriggerInteraction.Collide))
+        if (!Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactMask, QueryTriggerInteraction.Collide))
+            return;
+
+        var hitGO = hit.collider ? hit.collider.gameObject : null;
+        if (!hitGO) return;
+
+        // collect all MonoBehaviours, filter manually to avoid any Missing Script weirdness
+        MonoBehaviour[] monos = hitGO.GetComponentsInParent<MonoBehaviour>(true);
+
+        IInteractable chosen = null;
+        PoweredInteractable preferredGate = null;
+
+        for (int i = 0; i < monos.Length; i++)
         {
-            var all = hit.collider.GetComponentsInParent<IInteractable>(true);
-            IInteractable chosen = null;
+            var mb = monos[i];
+            if (!mb) continue;
 
-            // Prefer the *PoweredInteractable* wrapper if present
-            for (int i = 0; i < all.Length; i++)
-            {
-                if (all[i] is PoweredInteractable)   // <<< CHANGE IS HERE
-                {
-                    chosen = all[i];
-                    break;
-                }
-            }
+            if (mb is PoweredInteractable pi)
+                preferredGate = pi; // remember if we find a gate
 
-            // Otherwise fall back to the first found
-            if (chosen == null && all.Length > 0)
-                chosen = all[0];
+            if (mb is IInteractable ii && chosen == null)
+                chosen = ii; // first interactable as fallback
+        }
 
-            if (chosen != null && Input.GetMouseButtonDown(0))
-                chosen.Interact(transform);
+        // prefer the powered gate if present
+        if (preferredGate != null) chosen = preferredGate;
+
+        if (chosen == null)
+        {
+            Debug.Log($"[Player] No IInteractable found on '{hitGO.name}' (hit collider: {hit.collider.name}).");
+            return;
+        }
+
+        try
+        {
+            chosen.Interact(transform);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogException(ex, hitGO);
         }
     }
+
 }
