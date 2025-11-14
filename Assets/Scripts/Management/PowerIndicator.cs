@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Renderer))]
 public class PowerIndicator : MonoBehaviour, IPowerConsumer
@@ -20,15 +20,35 @@ public class PowerIndicator : MonoBehaviour, IPowerConsumer
     static readonly int LegacyColorID = Shader.PropertyToID("_Color");
     static readonly int EmissionID = Shader.PropertyToID("_EmissionColor");
 
+    [Header("Optional energy bar")]
+    public Transform fillBar;           // child mesh to scale on X (pivot on left)
+    public bool dimWithEnergy = false;  // also dim color by energy ratio
+
+    void HandleEnergyChanged(float ratio)
+    {
+        // Left→right fill: scale X and keep the left edge anchored (set pivot of mesh to left).
+        if (fillBar)
+        {
+            var s = fillBar.localScale;
+            s.x = Mathf.Max(0f, ratio);
+            fillBar.localScale = s;
+        }
+
+        if (dimWithEnergy)
+        {
+            // Optional: dim overall brightness by ratio
+            var baseC = powered ? onColor : offColor;
+            var c = Color.Lerp(offColor, baseC, Mathf.Clamp01(ratio));
+            Apply(c);
+        }
+    }
+
     void OnEnable()
     {
-        if (!rend) rend = GetComponent<Renderer>();
-        mpb ??= new MaterialPropertyBlock();
+        rend = GetComponent<Renderer>();
+        if (mpb == null) mpb = new MaterialPropertyBlock();
 
-        // register with the grid (so we get current state)
         PowerGridManager.Instance?.Register(this);
-
-        // subscribe to global events
         OnWarmupPulse += HandleWarmupPulse;
         OnVisualSnap += HandleSnap;
     }
@@ -36,48 +56,44 @@ public class PowerIndicator : MonoBehaviour, IPowerConsumer
     void OnDisable()
     {
         PowerGridManager.Instance?.Unregister(this);
-
         OnWarmupPulse -= HandleWarmupPulse;
         OnVisualSnap -= HandleSnap;
     }
 
-    // -------- IPowerConsumer --------
     public void OnPowerChanged(bool isOn)
     {
         powered = isOn;
         Apply(isOn ? onColor : offColor);
     }
 
-    // called DURING warmup while power is still logically off
     void HandleWarmupPulse(float t)
     {
-        // if we�re already marked as powered, ignore warmup
         if (powered) return;
-
-        t = Mathf.Clamp01(t);
-        t = Mathf.SmoothStep(0f, 1f, t);
-        Color c = Color.Lerp(offColor, onColor, t * 0.9f);  // stop just short of full on
-        Apply(c);
+        t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t));
+        Apply(Color.Lerp(offColor, onColor, t * 0.9f));
     }
 
-    // called whenever the grid snaps ON/OFF
-    void HandleSnap(bool isOn)
-    {
-        Apply(isOn ? onColor : offColor);
-    }
+    void HandleSnap(bool isOn) => Apply(isOn ? onColor : offColor);
 
     void Apply(Color c)
     {
-        if (!rend) return;
+        if (!rend)
+        {
+            // Try to recover if renderer got removed at runtime.
+            rend = GetComponent<Renderer>();
+            if (!rend) return;
+        }
+        if (mpb == null) mpb = new MaterialPropertyBlock();
 
         mpb.Clear();
+        // These ids are valid even if the material lacks the property – Unity just ignores it.
         mpb.SetColor(BaseColorID, c);
         mpb.SetColor(LegacyColorID, c);
         mpb.SetColor(EmissionID, c * emission);
+
         rend.SetPropertyBlock(mpb);
     }
 
-    // ---------- static helpers for PowerGrid ----------
     public static void BroadcastWarmup(float t) => OnWarmupPulse?.Invoke(t);
     public static void SnapAll(bool isOn) => OnVisualSnap?.Invoke(isOn);
 }
