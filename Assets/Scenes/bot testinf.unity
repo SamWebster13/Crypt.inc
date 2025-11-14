@@ -1671,6 +1671,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Base3.0 Prefab (Clone)
       objectReference: {fileID: 0}
+    - target: {fileID: 2104758253956297807, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_NavMeshData
+      value: 
+      objectReference: {fileID: 23800000, guid: 2a6444d65cda30041891456afe8566ca, type: 2}
     - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.7186385
@@ -2604,6 +2608,75 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1001 &1892847327
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1697017909426696615, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_Name
+      value: Base3.0 Prefab (Clone)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7186385
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7186385
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7186385
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 185.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 19.360312
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -312
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8278599237319313140, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 748568e2b562e654aa9645ff6fd80862, type: 3}
 --- !u!1 &1942570816
 GameObject:
   m_ObjectHideFlags: 0
@@ -2771,7 +2844,7 @@ Terrain:
   m_GameObject: {fileID: 1973021863}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: ded424da54b0b544b983099b19d35d34, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 3e7c2cc19d2784a4883414d041a0ed7d, type: 2}
   m_TreeDistance: 1500
   m_TreeBillboardDistance: 1400
   m_TreeCrossFadeLength: 200
@@ -3156,3 +3229,4 @@ SceneRoots:
   - {fileID: 3199022443288714078}
   - {fileID: 513949429}
   - {fileID: 1202633401}
+  - {fileID: 1892847327}
