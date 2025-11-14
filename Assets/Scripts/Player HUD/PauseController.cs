@@ -59,4 +59,9 @@ public class GamePauseController : MonoBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
+
+    public void Quit()
+    {
+        Debug.Log("testing");
+    }
 }
