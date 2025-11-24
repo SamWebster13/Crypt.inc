@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(BoxCollider), typeof(Renderer))]
 public class DoorShield : MonoBehaviour
@@ -14,6 +15,7 @@ public class DoorShield : MonoBehaviour
     public bool IsOpen { get; private set; }
 
     BoxCollider col;
+    NavMeshObstacle obstacle; // <-- added
     MaterialPropertyBlock mpb;
     float baseAlpha = 0.25f;
 
@@ -24,6 +26,8 @@ public class DoorShield : MonoBehaviour
     void Awake()
     {
         col = GetComponent<BoxCollider>();
+        obstacle = GetComponent<NavMeshObstacle>(); // <-- added
+
         if (!shieldRenderer) shieldRenderer = GetComponent<Renderer>();
 
         if (shieldRenderer && shieldRenderer.sharedMaterial != null)
@@ -45,7 +49,13 @@ public class DoorShield : MonoBehaviour
         Debug.Log($"[DoorShield:{name}] SetOpen({open})", this);
 
         IsOpen = open;
+
+        // Player collider
         if (col) col.isTrigger = open;
+
+        // AI blocker
+        if (obstacle) obstacle.enabled = !open;
+
         ApplyVisuals();
     }
 
