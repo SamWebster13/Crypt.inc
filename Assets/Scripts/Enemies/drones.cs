@@ -18,6 +18,11 @@ public class HunterAI : MonoBehaviour
     public float groundCheckDistance = 0.5f;
     public LayerMask whatIsGround;
 
+    [Header("Lifetime Settings")]
+    public float lifetime = 10f;   // how long this hunter lives
+    private float lifeTimer = 0f;
+
+
     private Transform currentTarget;
     private bool isGrounded;
     private Vector3 velocity;
@@ -27,19 +32,27 @@ public class HunterAI : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
 
-        // Add Rigidbody if missing
         if (rb == null)
-        {
             rb = gameObject.AddComponent<Rigidbody>();
-        }
 
-        // Configure Rigidbody so NavMeshAgent can still work
         rb.constraints = RigidbodyConstraints.FreezeRotation;
-        rb.useGravity = false; // we'll apply gravity manually
+        rb.useGravity = false;
+
+        // Auto-destroy after X seconds
+        Destroy(gameObject, lifetime);
     }
+
 
     private void Update()
     {
+        // Lifetime countdown
+        lifeTimer += Time.deltaTime;
+        if (lifeTimer >= lifetime)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         GroundCheck();
 
         // Apply gravity if not grounded
