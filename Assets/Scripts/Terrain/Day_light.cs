@@ -71,22 +71,36 @@ public class DayNightCycle : MonoBehaviour
         HandleEvents();
     }
 
+    public int currentDay = 1;
+    public bool isNight = false;
+
+    public UnityEvent onNewDay;
+
     void HandleEvents()
     {
+        // SUNRISE (06:00)
         if (timeOfDay >= 6f && timeOfDay < 6.1f && !sunriseTriggered)
         {
             onSunrise.Invoke();
+            onNewDay.Invoke();     // <-- NEW (start next day!)
+            currentDay++;          // <-- Day Count++
+            isNight = false;
+
             sunriseTriggered = true;
             sunsetTriggered = false;
-            Debug.Log("Sunrise");
+            Debug.Log("Sunrise - Day " + currentDay);
         }
 
+        // SUNSET (18:00)
         if (timeOfDay >= 18f && timeOfDay < 18.1f && !sunsetTriggered)
         {
             onSunset.Invoke();
+            isNight = true;
+
             sunsetTriggered = true;
             sunriseTriggered = false;
-            Debug.Log("Sunset");
+            Debug.Log("Sunset - Night of Day " + currentDay);
         }
     }
+
 }
