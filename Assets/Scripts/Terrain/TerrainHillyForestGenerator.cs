@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Terrain))]
@@ -6,8 +6,8 @@ public class TerrainHillyForestGenerator : MonoBehaviour
 {
     [Header("Seed & Size")]
     public int seed = 12345;
-    public Vector2Int heightmapResolution = new Vector2Int(513, 513); 
-    public Vector3 terrainSize = new Vector3(200f, 40f, 200f);        
+    public Vector2Int heightmapResolution = new Vector2Int(513, 513);
+    public Vector3 terrainSize = new Vector3(200f, 40f, 200f);
 
     [Header("Noise (fractal Perlin)")]
     public float noiseScale = 35f;
@@ -15,41 +15,53 @@ public class TerrainHillyForestGenerator : MonoBehaviour
     [Range(0f, 1f)] public float persistence = 0.5f;
     public float lacunarity = 2.0f;
 
-    [Header("Flat Base Area")]
-    public bool makeFlatBase = true;
-    public Vector2 baseCenterWorld = new Vector2(100f, 100f); 
-    public Vector2 baseSizeWorld = new Vector2(40f, 40f);     
-    [Range(0f, 1f)] public float baseHeight01 = 0.08f;         
-    public float edgeFalloffWorld = 8f;                       
-
-    // ------------------ NEW: Base placement options ------------------
+    // ------------------ NEW: Multiple flat base areas ------------------
     public enum BaseHeightMode { SampleTerrain, UsePadHeight01 }
 
-    [Header("Base Prefab Placement")]
+    [System.Serializable]
+    public class FlatPadSettings
+    {
+        [Header("Pad Enabled")]
+        public bool enabled = true;
+
+        [Header("Pad Shape (World XZ)")]
+        public Vector2 baseCenterWorld = new Vector2(100f, 100f);
+        public Vector2 baseSizeWorld = new Vector2(40f, 40f);
+        [Range(0f, 1f)] public float baseHeight01 = 0.08f;
+        public float edgeFalloffWorld = 8f;
+
+        [Header("Base Prefab Placement")]
+        public bool placeBasePrefab = true;
+        public GameObject basePrefab;
+        public BaseHeightMode baseHeightMode = BaseHeightMode.SampleTerrain;
+        public float baseRotationY = 0f;
+        public Vector3 basePrefabOffset = Vector3.zero;
+
+        [Tooltip("Force a large scale so it's visible the first time.")]
+        public float baseForceScale = 10f;
+
+        [Tooltip("If true, rescale the base uniformly to fit inside the pad.")]
+        public bool fitPrefabToPad = true;
+
+        [Tooltip("Multiply the fitted size to leave some margin (e.g., 0.95).")]
+        [Range(0.1f, 8f)] public float fitPadding = 0.95f;
+    }
+
+    [Header("Flat Base Areas")]
+    public bool makeFlatBase = true;
+    [Range(0, 16)] public int padCount = 1;
+    public List<FlatPadSettings> pads = new List<FlatPadSettings>();
+
+    [Header("Global Base Placement Options")]
+    [Tooltip("Master toggle to spawn base prefabs on pads that have placeBasePrefab enabled.")]
     public bool placeBasePrefab = true;
-    public GameObject basePrefab;        
-    public float baseRotationY = 0f;
-    public Vector3 basePrefabOffset = Vector3.zero;
-    public bool clearTreesOnPad = true;
 
-    [Tooltip("How to determine Y height for the base.")]
-    public BaseHeightMode baseHeightMode = BaseHeightMode.SampleTerrain;
-
-    [Tooltip("Force a large scale so it's visible the first time.")]
-    public float baseForceScale = 10f;
-
-    [Tooltip("If true, rescale the base uniformly to fit inside the pad.")]
-    public bool fitPrefabToPad = true;
-
-    [Tooltip("Multiply the fitted size to leave some margin (e.g., 0.95).")]
-    [Range(0.1f, 8f)] public float fitPadding = 0.95f;
-
-    [Tooltip("Parent the spawned base under the Terrain object once placed.")]
+    [Tooltip("Parent the spawned base(s) under the Terrain object once placed.")]
     public bool parentBaseUnderTerrain = false;
 
     [Tooltip("Log the final world position/scale after spawn.")]
     public bool logBaseSpawn = true;
-    // -----------------------------------------------------------------
+    // -------------------------------------------------------------------
 
     [Header("Trees")]
     public GameObject[] treePrefabs;
@@ -58,12 +70,30 @@ public class TerrainHillyForestGenerator : MonoBehaviour
     [Range(0f, 60f)] public float slopeLimit = 28f;
     public Vector2 heightRange01 = new Vector2(0.05f, 0.9f);
     public Vector2 scaleRange = new Vector2(0.8f, 1.3f);
+    public bool clearTreesOnPad = true;
+
+    // ---------- NEW: Terrain texturing ----------
+    [Header("Terrain Texturing (Slope Debug)")]
+    public bool generateSlopeSplat = true;
+
+    [Tooltip("Texture used on flatter areas (grass/dirt).")]
+    public TerrainLayer flatLayer;
+
+    [Tooltip("Texture used on steeper slopes (rock).")]
+    public TerrainLayer steepLayer;
+
+    [Range(0f, 70f)]
+    public float steepSlopeStart = 30f;   // when rock starts to appear
+
+    [Range(0f, 89f)]
+    public float steepSlopeFull = 60f;    // fully rock by this angle
+    // --------------------------------------------
 
     Terrain terrain;
     TerrainData data;
     System.Random rng;
 
-    GameObject baseInstance;
+    List<GameObject> baseInstances = new List<GameObject>();
 
     void OnValidate()
     {
@@ -73,11 +103,23 @@ public class TerrainHillyForestGenerator : MonoBehaviour
         terrainSize.y = Mathf.Max(1f, terrainSize.y);
         terrainSize.z = Mathf.Max(10f, terrainSize.z);
 
+        // Tree weights sanity
         if (treePrefabs != null && treeWeights != null && treeWeights.Length != treePrefabs.Length)
         {
             System.Array.Resize(ref treeWeights, treePrefabs.Length);
             for (int i = 0; i < treeWeights.Length; i++)
                 if (treeWeights[i] <= 0f) treeWeights[i] = 1f;
+        }
+
+        // Ensure pads list size matches padCount
+        if (pads == null) pads = new List<FlatPadSettings>();
+        while (pads.Count < padCount)
+        {
+            pads.Add(new FlatPadSettings());
+        }
+        while (pads.Count > padCount)
+        {
+            pads.RemoveAt(pads.Count - 1);
         }
     }
 
@@ -88,12 +130,17 @@ public class TerrainHillyForestGenerator : MonoBehaviour
         PrepareTerrainAsset();
         GenerateHeights();
 
-        if (placeBasePrefab) PlaceBasePrefab();
+        // ★ NEW: auto-paint terrain based on slope
+        GenerateSlopeSplatmap();
+
+        if (placeBasePrefab)
+            PlaceBasePrefabs();
 
         SetupTreePrototypes();
         ScatterTrees();
 
-        if (clearTreesOnPad) ClearTreesOnPad();
+        if (clearTreesOnPad)
+            ClearTreesOnPads();
     }
 
     [ContextMenu("Place Base Only")]
@@ -101,7 +148,7 @@ public class TerrainHillyForestGenerator : MonoBehaviour
     {
         if (!terrain) terrain = GetComponent<Terrain>();
         if (!data) data = terrain.terrainData;
-        PlaceBasePrefab();
+        PlaceBasePrefabs();
     }
 
     [ContextMenu("Regenerate Trees Only")]
@@ -111,7 +158,7 @@ public class TerrainHillyForestGenerator : MonoBehaviour
         if (!data) data = terrain.terrainData;
         SetupTreePrototypes();
         ScatterTrees();
-        if (clearTreesOnPad) ClearTreesOnPad();
+        if (clearTreesOnPad) ClearTreesOnPads();
     }
 
     [ContextMenu("Randomize Seed + Generate")]
@@ -175,7 +222,6 @@ public class TerrainHillyForestGenerator : MonoBehaviour
                     freq *= lacunarity;
                 }
 
-                
                 float norm = (1f - Mathf.Pow(persistence, octaves)) / (1f - Mathf.Max(0.0001f, persistence));
                 h /= Mathf.Max(0.0001f, norm);
 
@@ -183,23 +229,79 @@ public class TerrainHillyForestGenerator : MonoBehaviour
             }
         }
 
-        if (makeFlatBase)
-            ApplyFlatRect(ref heights);
+        if (makeFlatBase && pads != null && pads.Count > 0)
+            ApplyFlatRects(ref heights);
 
         data.SetHeights(0, 0, heights);
     }
 
-    void ApplyFlatRect(ref float[,] heights)
+    // ---------- NEW: slope-based texture painting ----------
+    void GenerateSlopeSplatmap()
+    {
+        if (!generateSlopeSplat) return;
+
+        if (!flatLayer || !steepLayer)
+        {
+            Debug.LogWarning("[TerrainGen] Slope splatmap requested but flatLayer / steepLayer not assigned.");
+            return;
+        }
+
+        // Assign the layers to the terrain
+        data.terrainLayers = new TerrainLayer[]
+        {
+            flatLayer, // index 0 = flat
+            steepLayer // index 1 = steep
+        };
+
+        int res = data.alphamapResolution;
+        float[,,] alpha = new float[res, res, 2];
+
+        for (int z = 0; z < res; z++)
+        {
+            for (int x = 0; x < res; x++)
+            {
+                float u = x / (float)(res - 1);
+                float v = z / (float)(res - 1);
+
+                // Slope in degrees at this point
+                float slope = data.GetSteepness(u, v);
+
+                // 0 = all flat, 1 = all steep
+                float steepW = Mathf.InverseLerp(steepSlopeStart, steepSlopeFull, slope);
+                steepW = Mathf.Clamp01(steepW);
+                float flatW = 1f - steepW;
+
+                alpha[z, x, 0] = flatW;   // flat layer weight
+                alpha[z, x, 1] = steepW;  // steep layer weight
+            }
+        }
+
+        data.SetAlphamaps(0, 0, alpha);
+    }
+    // -------------------------------------------------------
+
+    // Apply all pads
+    void ApplyFlatRects(ref float[,] heights)
     {
         int res = data.heightmapResolution;
+        for (int i = 0; i < pads.Count; i++)
+        {
+            var pad = pads[i];
+            if (!pad.enabled) continue;
+            ApplyPadRect(ref heights, res, pad);
+        }
+    }
 
-        
-        float nxCenter = Mathf.Clamp01(baseCenterWorld.x / terrainSize.x);
-        float nzCenter = Mathf.Clamp01(baseCenterWorld.y / terrainSize.z);
-        float nxHalf = Mathf.Clamp01(0.5f * baseSizeWorld.x / terrainSize.x);
-        float nzHalf = Mathf.Clamp01(0.5f * baseSizeWorld.y / terrainSize.z);
-        float nFallX = Mathf.Clamp01(edgeFalloffWorld / terrainSize.x);
-        float nFallZ = Mathf.Clamp01(edgeFalloffWorld / terrainSize.z);
+    // Single pad flattening (was ApplyFlatRect before)
+    void ApplyPadRect(ref float[,] heights, int res, FlatPadSettings pad)
+    {
+        // Normalized center & size relative to terrain
+        float nxCenter = Mathf.Clamp01(pad.baseCenterWorld.x / terrainSize.x);
+        float nzCenter = Mathf.Clamp01(pad.baseCenterWorld.y / terrainSize.z);
+        float nxHalf = Mathf.Clamp01(0.5f * pad.baseSizeWorld.x / terrainSize.x);
+        float nzHalf = Mathf.Clamp01(0.5f * pad.baseSizeWorld.y / terrainSize.z);
+        float nFallX = Mathf.Clamp01(pad.edgeFalloffWorld / terrainSize.x);
+        float nFallZ = Mathf.Clamp01(pad.edgeFalloffWorld / terrainSize.z);
 
         int xMin = Mathf.Clamp(Mathf.RoundToInt((nxCenter - nxHalf - nFallX) * (res - 1)), 0, res - 1);
         int xMax = Mathf.Clamp(Mathf.RoundToInt((nxCenter + nxHalf + nFallX) * (res - 1)), 0, res - 1);
@@ -226,7 +328,7 @@ public class TerrainHillyForestGenerator : MonoBehaviour
                 float t = Mathf.Max(tx, tz);
 
                 float original = heights[z, x];
-                heights[z, x] = Mathf.Lerp(baseHeight01, original, t);
+                heights[z, x] = Mathf.Lerp(pad.baseHeight01, original, t);
             }
         }
     }
@@ -253,7 +355,7 @@ public class TerrainHillyForestGenerator : MonoBehaviour
 
                 if (!valid)
                 {
-                    Debug.LogWarning($"[TerrainGen] Skipping tree prefab '{p.name}' � no valid MeshRenderer/LODGroup.");
+                    Debug.LogWarning($"[TerrainGen] Skipping tree prefab '{p.name}' — no valid MeshRenderer/LODGroup.");
                     continue;
                 }
 
@@ -284,7 +386,7 @@ public class TerrainHillyForestGenerator : MonoBehaviour
             float rx = (float)rng.NextDouble();
             float rz = (float)rng.NextDouble();
 
-            if (makeFlatBase && IsInsidePad(rx, rz)) continue;
+            if (makeFlatBase && IsInsideAnyPad(rx, rz)) continue;
 
             float height01 = data.GetInterpolatedHeight(rx, rz) / terrainSize.y;
             if (height01 < heightRange01.x || height01 > heightRange01.y) continue;
@@ -315,18 +417,28 @@ public class TerrainHillyForestGenerator : MonoBehaviour
         Debug.Log("Placed trees: " + placed);
     }
 
-    bool IsInsidePad(float rx, float rz)
+    bool IsInsideAnyPad(float rx, float rz)
     {
-        float nxCenter = Mathf.Clamp01(baseCenterWorld.x / terrainSize.x);
-        float nzCenter = Mathf.Clamp01(baseCenterWorld.y / terrainSize.z);
-        float nxHalf = Mathf.Clamp01(0.5f * baseSizeWorld.x / terrainSize.x);
-        float nzHalf = Mathf.Clamp01(0.5f * baseSizeWorld.y / terrainSize.z);
+        if (!makeFlatBase || pads == null) return false;
 
-        return (rx >= nxCenter - nxHalf && rx <= nxCenter + nxHalf &&
-                rz >= nzCenter - nzHalf && rz <= nzCenter + nzHalf);
+        for (int i = 0; i < pads.Count; i++)
+        {
+            var pad = pads[i];
+            if (!pad.enabled) continue;
+
+            float nxCenter = Mathf.Clamp01(pad.baseCenterWorld.x / terrainSize.x);
+            float nzCenter = Mathf.Clamp01(pad.baseCenterWorld.y / terrainSize.z);
+            float nxHalf = Mathf.Clamp01(0.5f * pad.baseSizeWorld.x / terrainSize.x);
+            float nzHalf = Mathf.Clamp01(0.5f * pad.baseSizeWorld.y / terrainSize.z);
+
+            if (rx >= nxCenter - nxHalf && rx <= nxCenter + nxHalf &&
+                rz >= nzCenter - nzHalf && rz <= nzCenter + nzHalf)
+                return true;
+        }
+        return false;
     }
 
-    void ClearTreesOnPad()
+    void ClearTreesOnPads()
     {
         var arr = data.treeInstances;
         if (arr == null || arr.Length == 0) return;
@@ -335,7 +447,7 @@ public class TerrainHillyForestGenerator : MonoBehaviour
         for (int i = 0; i < arr.Length; i++)
         {
             var t = arr[i];
-            if (makeFlatBase && IsInsidePad(t.position.x, t.position.z)) continue;
+            if (makeFlatBase && IsInsideAnyPad(t.position.x, t.position.z)) continue;
             kept.Add(t);
         }
         data.SetTreeInstances(kept.ToArray(), true);
@@ -347,110 +459,140 @@ public class TerrainHillyForestGenerator : MonoBehaviour
         return (float)rng.NextDouble() * (r.y - r.x) + r.x;
     }
 
-    // ---------- Base spawn (rewritten) ----------
-    void PlaceBasePrefab()
+    // ---------- Base spawn (multiple pads) ----------
+    void PlaceBasePrefabs()
     {
-        if (!basePrefab)
+        if (!makeFlatBase || pads == null || pads.Count == 0)
         {
-            Debug.LogWarning("[TerrainGen] placeBasePrefab is true but basePrefab is not assigned.");
+            Debug.LogWarning("[TerrainGen] No pads configured to place bases on.");
             return;
         }
 
         if (!terrain) terrain = GetComponent<Terrain>();
         if (!data) data = terrain.terrainData;
 
-       
-        if (baseInstance)
+        // Destroy old instances
+        if (baseInstances != null)
         {
+            for (int i = 0; i < baseInstances.Count; i++)
+            {
+                var inst = baseInstances[i];
+                if (!inst) continue;
+
 #if UNITY_EDITOR
-            if (!Application.isPlaying) DestroyImmediate(baseInstance);
-            else Destroy(baseInstance);
+                if (!Application.isPlaying) DestroyImmediate(inst);
+                else Destroy(inst);
 #else
-            Destroy(baseInstance);
+                Destroy(inst);
 #endif
-            baseInstance = null;
+            }
+            baseInstances.Clear();
+        }
+        else
+        {
+            baseInstances = new List<GameObject>();
         }
 
-    
         Vector3 terrainOrigin = terrain.GetPosition();
 
-       
-        Vector3 padWorldXZ = terrainOrigin + new Vector3(baseCenterWorld.x, 0f, baseCenterWorld.y);
+        // For each pad, spawn its base (if configured)
+        for (int i = 0; i < pads.Count; i++)
+        {
+            var pad = pads[i];
+            if (!pad.enabled) continue;
+            if (!placeBasePrefab) continue;          // global master switch
+            if (!pad.placeBasePrefab) continue;      // per-pad switch
+            if (!pad.basePrefab)
+            {
+                Debug.LogWarning($"[TerrainGen] Pad {i}: placeBasePrefab is true but basePrefab is not assigned.");
+                continue;
+            }
 
-      
-        float y;
-        if (baseHeightMode == BaseHeightMode.SampleTerrain)
-            y = terrain.SampleHeight(padWorldXZ) + terrainOrigin.y;
-        else
-            y = baseHeight01 * terrainSize.y + terrainOrigin.y;
+            Vector3 padWorldXZ = terrainOrigin + new Vector3(pad.baseCenterWorld.x, 0f, pad.baseCenterWorld.y);
 
-        Vector3 worldPos = new Vector3(padWorldXZ.x, y, padWorldXZ.z) + basePrefabOffset;
-        Quaternion rot = Quaternion.Euler(0f, baseRotationY, 0f);
+            float y;
+            if (pad.baseHeightMode == BaseHeightMode.SampleTerrain)
+                y = terrain.SampleHeight(padWorldXZ) + terrainOrigin.y;
+            else
+                y = pad.baseHeight01 * terrainSize.y + terrainOrigin.y;
 
-  
-        GameObject go = null;
+            Vector3 worldPos = new Vector3(padWorldXZ.x, y, padWorldXZ.z) + pad.basePrefabOffset;
+            Quaternion rot = Quaternion.Euler(0f, pad.baseRotationY, 0f);
+
+            GameObject go = null;
 #if UNITY_EDITOR
-        bool isPrefabAsset = UnityEditor.PrefabUtility.IsPartOfPrefabAsset(basePrefab);
-        if (!Application.isPlaying && isPrefabAsset)
-            go = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(basePrefab);
-        else
-            go = Instantiate(basePrefab);
+            bool isPrefabAsset = UnityEditor.PrefabUtility.IsPartOfPrefabAsset(pad.basePrefab);
+            if (!Application.isPlaying && isPrefabAsset)
+                go = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(pad.basePrefab);
+            else
+                go = Instantiate(pad.basePrefab);
 #else
-        go = Instantiate(basePrefab);
+            go = Instantiate(pad.basePrefab);
 #endif
 
-        baseInstance = go;
-        baseInstance.name = basePrefab.name + " (Clone)";
-        baseInstance.transform.SetPositionAndRotation(worldPos, rot);
-        baseInstance.layer = 0;
-        baseInstance.SetActive(true);
+            go.name = pad.basePrefab.name + " (Pad " + i + ")";
+            go.transform.SetPositionAndRotation(worldPos, rot);
+            go.layer = 0;
+            go.SetActive(true);
 
-       
-        var lod = baseInstance.GetComponentInChildren<LODGroup>(true);
-        if (lod) lod.ForceLOD(0);
+            var lod = go.GetComponentInChildren<LODGroup>(true);
+            if (lod) lod.ForceLOD(0);
 
-      
-        baseInstance.transform.localScale = Vector3.one * Mathf.Max(0.01f, baseForceScale);
+            // Initial forced scale
+            go.transform.localScale = Vector3.one * Mathf.Max(0.01f, pad.baseForceScale);
 
-       
-        if (fitPrefabToPad)
-        {
-            var rs = baseInstance.GetComponentsInChildren<Renderer>(true);
-            if (rs.Length > 0)
+            // Fit to pad footprint
+            if (pad.fitPrefabToPad)
             {
-                Bounds b = rs[0].bounds;
-                for (int i = 1; i < rs.Length; i++) b.Encapsulate(rs[i].bounds);
+                var rs = go.GetComponentsInChildren<Renderer>(true);
+                if (rs.Length > 0)
+                {
+                    Bounds b = rs[0].bounds;
+                    for (int r = 1; r < rs.Length; r++) b.Encapsulate(rs[r].bounds);
 
-                float curX = Mathf.Max(0.01f, b.size.x);
-                float curZ = Mathf.Max(0.01f, b.size.z);
+                    float curX = Mathf.Max(0.01f, b.size.x);
+                    float curZ = Mathf.Max(0.01f, b.size.z);
 
-                float targetX = Mathf.Max(0.01f, baseSizeWorld.x) * fitPadding;
-                float targetZ = Mathf.Max(0.01f, baseSizeWorld.y) * fitPadding;
+                    float targetX = Mathf.Max(0.01f, pad.baseSizeWorld.x) * pad.fitPadding;
+                    float targetZ = Mathf.Max(0.01f, pad.baseSizeWorld.y) * pad.fitPadding;
 
-                float s = Mathf.Min(targetX / curX, targetZ / curZ);
-                baseInstance.transform.localScale = Vector3.one * s;
+                    float s = Mathf.Min(targetX / curX, targetZ / curZ);
+                    go.transform.localScale = Vector3.one * s;
+                }
             }
+
+            if (parentBaseUnderTerrain)
+                go.transform.SetParent(this.transform, true);
+
+            if (logBaseSpawn)
+                Debug.Log($"[TerrainGen] Pad {i} base spawned @ {worldPos}  scale={go.transform.localScale}  parented={parentBaseUnderTerrain}");
+
+            baseInstances.Add(go);
         }
-
-        if (parentBaseUnderTerrain)
-            baseInstance.transform.SetParent(this.transform, true);
-
-        if (logBaseSpawn)
-            Debug.Log($"[TerrainGen] Base spawned @ {worldPos}  scale={baseInstance.transform.localScale}  parented={parentBaseUnderTerrain}");
     }
 
-  
     void OnDrawGizmosSelected()
     {
-        if (!makeFlatBase) return;
-        Gizmos.color = new Color(0f, 1f, 0f, 0.25f);
-        Vector3 c = new Vector3(baseCenterWorld.x, baseHeight01 * terrainSize.y, baseCenterWorld.y);
-        Vector3 sz = new Vector3(baseSizeWorld.x, 0.1f, baseSizeWorld.y);
-        Gizmos.DrawCube(GetTerrainOrigin() + c, sz);
+        if (!makeFlatBase || pads == null) return;
 
-        Gizmos.color = new Color(1f, 1f, 0f, 0.2f);
-        Vector3 szFall = sz + new Vector3(edgeFalloffWorld * 2f, 0.1f, edgeFalloffWorld * 2f);
-        Gizmos.DrawWireCube(GetTerrainOrigin() + c, szFall);
+        Vector3 origin = GetTerrainOrigin();
+
+        for (int i = 0; i < pads.Count; i++)
+        {
+            var pad = pads[i];
+            if (!pad.enabled) continue;
+
+            // Inner pad
+            Gizmos.color = new Color(0f, 1f, 0f, 0.25f);
+            Vector3 c = new Vector3(pad.baseCenterWorld.x, pad.baseHeight01 * terrainSize.y, pad.baseCenterWorld.y);
+            Vector3 sz = new Vector3(pad.baseSizeWorld.x, 0.1f, pad.baseSizeWorld.y);
+            Gizmos.DrawCube(origin + c, sz);
+
+            // Falloff region
+            Gizmos.color = new Color(1f, 1f, 0f, 0.2f);
+            Vector3 szFall = sz + new Vector3(pad.edgeFalloffWorld * 2f, 0.1f, pad.edgeFalloffWorld * 2f);
+            Gizmos.DrawWireCube(origin + c, szFall);
+        }
     }
 
     Vector3 GetTerrainOrigin()
