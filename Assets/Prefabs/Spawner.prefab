@@ -1,36 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &733991269542399496
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9191843693087532804}
-  m_Layer: 0
-  m_Name: DroneSpawn2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &9191843693087532804
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 733991269542399496}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.14, y: 2.87, z: 17.35}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3162112441146912422}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &777790090524213637
 GameObject:
   m_ObjectHideFlags: 0
@@ -67,7 +36,6 @@ Transform:
   - {fileID: 2733583762200801192}
   - {fileID: 7753468825617110117}
   - {fileID: 8572071911219230075}
-  - {fileID: 9191843693087532804}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3090488483527388630
@@ -162,13 +130,15 @@ MonoBehaviour:
   enemyPrefab: {fileID: 2791507951437746314, guid: 393301c73f2622640a6b084b77d951e9, type: 3}
   dronePrefab: {fileID: 5932741580529620628, guid: 2288b6f7424f46d4fbbfdd6f9cdd908f, type: 3}
   enemySpawnInterval: 3
-  enemyTimer: 0
   enemySpawnPoints:
   - {fileID: 2733583762200801192}
   - {fileID: 7753468825617110117}
   droneSpawnPoints:
-  - {fileID: 8572071911219230075}
-  - {fileID: 9191843693087532804}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   enemyPool: {fileID: 0}
   dronePool: {fileID: 0}
   cycle: {fileID: 0}
@@ -197,7 +167,7 @@ Transform:
   m_GameObject: {fileID: 7524796207371913740}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.71, y: 1.86, z: 12.04}
+  m_LocalPosition: {x: 89.454, y: -1.814, z: 49.848}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

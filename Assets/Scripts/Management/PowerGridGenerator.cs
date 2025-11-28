@@ -92,7 +92,7 @@ public class PowerGridManager : MonoBehaviour
             if (drainAccum >= Mathf.Max(0.01f, logChunk) || energy <= 0f)
             {
                 float ratio = (maxEnergy <= 0f) ? 0f : energy / maxEnergy;
-                Debug.Log($"[PowerGrid] Drain {drainAccum:0.00} (rate {totalDrain:0.00}/s) → Energy {energy:0.00}/{maxEnergy} ({ratio:P0})");
+                // Debug.Log($"[PowerGrid] Drain {drainAccum:0.00} (rate {totalDrain:0.00}/s) → Energy {energy:0.00}/{maxEnergy} ({ratio:P0})");
                 drainAccum = 0f;
             }
 
@@ -115,7 +115,7 @@ public class PowerGridManager : MonoBehaviour
             if (gained >= Mathf.Max(0.01f, logChunk))
             {
                 float ratio = (maxEnergy <= 0f) ? 0f : energy / maxEnergy;
-                Debug.Log($"[PowerGrid] Regen {gained:0.00} (rate {idleRegenPerSecond:0.00}/s) → Energy {energy:0.00}/{maxEnergy} ({ratio:P0})");
+                // Debug.Log($"[PowerGrid] Regen {gained:0.00} (rate {idleRegenPerSecond:0.00}/s) → Energy {energy:0.00}/{maxEnergy} ({ratio:P0})");
             }
 
             FireEnergyChanged();
@@ -128,12 +128,12 @@ public class PowerGridManager : MonoBehaviour
     // ---------- Public control ----------
     public void TogglePower()
     {
-        if (verbose) Debug.Log($"[PowerGrid] Toggle pressed. isOn={isOn}, isCooling={isCooling}, warmupCo={(warmupCo != null)}");
+        // if (verbose) Debug.Log($"[PowerGrid] Toggle pressed. isOn={isOn}, isCooling={isCooling}, warmupCo={(warmupCo != null)}");
 
         // HARD gate by timestamp so restarts are impossible before the window ends
         if (Time.time < restartReadyAt)
         {
-            if (verbose) Debug.Log($"[PowerGrid] Restart locked ({Mathf.CeilToInt(restartReadyAt - Time.time)}s left).");
+            // if (verbose) Debug.Log($"[PowerGrid] Restart locked ({Mathf.CeilToInt(restartReadyAt - Time.time)}s left).");
             return;
         }
 
@@ -166,7 +166,7 @@ public class PowerGridManager : MonoBehaviour
         isOn = on;
         debugIsOn = on;
 
-        if (verbose) Debug.Log($"[PowerGrid] SetPowerState({on})");
+        // if (verbose) Debug.Log($"[PowerGrid] SetPowerState({on})");
 
         // keep your indicator lights in sync
         PowerIndicator.SnapAll(on);
@@ -194,7 +194,7 @@ public class PowerGridManager : MonoBehaviour
 
     void ForceShutdownAndCooldown()
     {
-        if (verbose) Debug.Log("[PowerGrid] Energy depleted → shutdown & cooldown");
+        // if (verbose) Debug.Log("[PowerGrid] Energy depleted → shutdown & cooldown");
 
         SetPowerState(false);
 
@@ -248,7 +248,7 @@ public class PowerGridManager : MonoBehaviour
             if (verbose)
             {
                 var mb = c as MonoBehaviour;
-                Debug.Log($"[PowerGrid] + Registered consumer {(mb ? mb.name : c.GetType().Name)}");
+                // Debug.Log($"[PowerGrid] + Registered consumer {(mb ? mb.name : c.GetType().Name)}");
             }
         }
     }
@@ -259,29 +259,29 @@ public class PowerGridManager : MonoBehaviour
         if (consumers.Remove(c) && verbose)
         {
             var mb = c as MonoBehaviour;
-            Debug.Log($"[PowerGrid] - Unregistered consumer {(mb ? mb.name : c.GetType().Name)}");
+            // Debug.Log($"[PowerGrid] - Unregistered consumer {(mb ? mb.name : c.GetType().Name)}");
         }
     }
 
     void NotifyAll(bool on)
     {
-        if (verbose) Debug.Log($"[PowerGrid] NotifyAll({on}) to {consumers.Count} consumers");
+        // if (verbose) Debug.Log($"[PowerGrid] NotifyAll({on}) to {consumers.Count} consumers");
         for (int i = 0; i < consumers.Count; i++)
         {
             var c = consumers[i];
-            if (c == null) { if (verbose) Debug.Log($"[PowerGrid]   consumer {i} is NULL"); continue; }
+            // if (c == null) { if (verbose) Debug.Log($"[PowerGrid]   consumer {i} is NULL"); continue; }
 
             var mb = c as MonoBehaviour;
             string who = mb ? mb.name : c.GetType().Name;
 
             try
             {
-                if (verbose) Debug.Log($"[PowerGrid]   -> notifying {who} ({c.GetType().Name}) with {on}");
+                // if (verbose) Debug.Log($"[PowerGrid]   -> notifying {who} ({c.GetType().Name}) with {on}");
                 c.OnPowerChanged(on);
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"[PowerGrid]   !!! {who} threw during OnPowerChanged({on}):\n{ex}");
+                // Debug.LogError($"[PowerGrid]   !!! {who} threw during OnPowerChanged({on}):\n{ex}");
             }
         }
     }

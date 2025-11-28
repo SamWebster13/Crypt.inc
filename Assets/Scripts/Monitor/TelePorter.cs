@@ -4,33 +4,39 @@ using UnityEngine;
 public class TVScreenTeleporter : MonoBehaviour
 {
     [Header("Refs")]
-    public TVScreenController tv;          // drag your TV here
-    public Transform[] arrivalPoints;      // optional: per-camera arrival markers
+    public TVScreenController tv;          // Drag your TV here
+    public Transform[] arrivalPoints;      // Optional: per-camera arrival markers
+    public Spawner spawner;                // Reference to your drone spawner
 
     [Header("Defaults")]
-    public float forwardOffset = 1.2f;     // if no arrival point, spawn in front of cam
-    public bool matchCameraYawOnly = true; // keep player upright
-    public LayerMask groundMask = ~0;      // snap-to-ground mask
+    public float forwardOffset = 1.2f;
+    public bool matchCameraYawOnly = true;
+    public LayerMask groundMask = ~0;
     public float snapDownDistance = 3f;
 
     [Header("Gating")]
-    public bool requirePowerOn = true;     // only works when TV is on
+    public bool requirePowerOn = true;     // Only works when TV is on
 
     Collider col;
 
     void Awake()
     {
         col = GetComponent<Collider>();
-        col.isTrigger = true; // must be trigger for touch
+        col.isTrigger = true;
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
+
+        // 1) Teleport player
         Warp(other.transform);
+
+        // 2) Update drone spawn points
+        ActivateDroneSpawnPoints();
     }
 
-    // You can also call this from a button (see TVTeleportInteract below)
+    // --- Player teleport logic (unchanged) ---
     public void Warp(Transform playerRoot)
     {
         if (!tv || tv.SourceCount == 0) return;
@@ -39,10 +45,9 @@ public class TVScreenTeleporter : MonoBehaviour
         Camera cam = tv.sources[tv.ActiveIndex];
         if (!cam) return;
 
-        // 1) Choose destination
-        Vector3 dstPos; Quaternion dstRot;
+        Vector3 dstPos;
+        Quaternion dstRot;
 
-        // Prefer authored arrival point for this feed
         if (arrivalPoints != null &&
             tv.ActiveIndex < arrivalPoints.Length &&
             arrivalPoints[tv.ActiveIndex] != null)
@@ -52,21 +57,16 @@ public class TVScreenTeleporter : MonoBehaviour
         }
         else
         {
-            // Fallback: in front of the camera, with (optional) yaw-only rotation
             var cT = cam.transform;
             dstPos = cT.position + cT.forward * forwardOffset;
-
-            if (matchCameraYawOnly)
-                dstRot = Quaternion.Euler(0f, cT.eulerAngles.y, 0f);
-            else
-                dstRot = cT.rotation;
+            dstRot = matchCameraYawOnly
+                ? Quaternion.Euler(0f, cT.eulerAngles.y, 0f)
+                : cT.rotation;
         }
 
-        // 2) Snap to ground (optional)
         if (Physics.Raycast(dstPos + Vector3.up, Vector3.down, out var hit, snapDownDistance + 1f, groundMask))
             dstPos = hit.point;
 
-        // 3) Move the player safely (works with CharacterController)
         var cc = playerRoot.GetComponent<CharacterController>();
         if (cc)
         {
@@ -77,6 +77,26 @@ public class TVScreenTeleporter : MonoBehaviour
         else
         {
             playerRoot.SetPositionAndRotation(dstPos, dstRot);
+        }
+    }
+
+    // --- NEW: Activate drone spawn points for current camera ---
+    void ActivateDroneSpawnPoints()
+    {
+        if (spawner == null || spawner.droneSpawnPoints.Length == 0) return;
+
+        // Deactivate all points first
+        foreach (var point in spawner.droneSpawnPoints)
+        {
+            if (point != null)
+                point.gameObject.SetActive(false);
+        }
+
+        // Activate only the point corresponding to the active camera
+        int camIndex = tv.ActiveIndex;
+        if (camIndex < spawner.droneSpawnPoints.Length && spawner.droneSpawnPoints[camIndex] != null)
+        {
+            spawner.droneSpawnPoints[camIndex].gameObject.SetActive(true);
         }
     }
 }

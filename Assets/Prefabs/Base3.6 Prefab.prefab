@@ -347,7 +347,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.016666668
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 8ab577d26fb4f27479b4cc30175f48ac, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 7038510d2c305d046bcef4373664609f, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &362100087587318660
 GameObject:
@@ -488,7 +488,7 @@ Transform:
   m_GameObject: {fileID: 485138939420267807}
   serializedVersion: 2
   m_LocalRotation: {x: -0.4103758, y: 0.58924186, z: -0.39785358, w: -0.57105017}
-  m_LocalPosition: {x: -13.879987, y: 1.3399992, z: -8.15}
+  m_LocalPosition: {x: -9.77, y: 12.47, z: -7.78}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -608,7 +608,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7623126359185615285}
   m_Layer: 0
-  m_Name: teleport2
+  m_Name: teleport5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -623,7 +623,7 @@ Transform:
   m_GameObject: {fileID: 558829325754442422}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: -0, z: 23.22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1653,7 +1653,7 @@ Transform:
   m_GameObject: {fileID: 5385169570065491113}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1780,7 +1780,7 @@ GameObject:
   m_Component:
   - component: {fileID: 940067723104406705}
   m_Layer: 0
-  m_Name: teleport2
+  m_Name: teleport3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1795,7 +1795,7 @@ Transform:
   m_GameObject: {fileID: 7749615192169282360}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 20.41, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1811,7 +1811,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8647708448787995830}
   m_Layer: 0
-  m_Name: teleport2
+  m_Name: teleport4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1826,7 +1826,7 @@ Transform:
   m_GameObject: {fileID: 7793000601102698749}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: -5.32, z: 12.24}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1857,7 +1857,7 @@ Transform:
   m_GameObject: {fileID: 7884285508285260530}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3.82, y: 2.21, z: 11.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2391,6 +2391,10 @@ MonoBehaviour:
   arrivalPoints:
   - {fileID: 5889397744553699430}
   - {fileID: 2864074065841638820}
+  - {fileID: 940067723104406705}
+  - {fileID: 8647708448787995830}
+  - {fileID: 7623126359185615285}
+  spawner: {fileID: 0}
   forwardOffset: 1.2
   matchCameraYawOnly: 1
   groundMask:
