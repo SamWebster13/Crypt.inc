@@ -703,6 +703,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70957c3d4252d7c42999217c2ac10e8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PortalTrigger
+  _portal: {fileID: 0}
+  _lastSide: 0
+  _tracking: 0
 --- !u!65 &1045825144
 BoxCollider:
   m_ObjectHideFlags: 0
