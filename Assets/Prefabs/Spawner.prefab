@@ -66,8 +66,16 @@ Transform:
   m_Children:
   - {fileID: 2733583762200801192}
   - {fileID: 7753468825617110117}
+<<<<<<< Updated upstream
   - {fileID: 8572071911219230075}
   - {fileID: 9191843693087532804}
+=======
+  - {fileID: 7156539705943669716}
+  - {fileID: 1387774317169527364}
+  - {fileID: 2285987169149551214}
+  - {fileID: 3899231192677052227}
+  - {fileID: 3497136090728557211}
+>>>>>>> Stashed changes
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3090488483527388630
@@ -166,9 +174,21 @@ MonoBehaviour:
   - {fileID: 2733583762200801192}
   - {fileID: 7753468825617110117}
   droneSpawnPoints:
+<<<<<<< Updated upstream
   - {fileID: 8572071911219230075}
   - {fileID: 9191843693087532804}
 --- !u!1 &7524796207371913740
+=======
+  - {fileID: 7156539705943669716}
+  - {fileID: 1387774317169527364}
+  - {fileID: 2285987169149551214}
+  - {fileID: 3899231192677052227}
+  - {fileID: 3497136090728557211}
+  enemyPool: {fileID: 0}
+  dronePool: {fileID: 0}
+  cycle: {fileID: 0}
+--- !u!1 &1315913948487322307
+>>>>>>> Stashed changes
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,25 +196,93 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8572071911219230075}
+  - component: {fileID: 2285987169149551214}
   m_Layer: 0
-  m_Name: DroneSpawn1
+  m_Name: DroneSpawn3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8572071911219230075
+--- !u!4 &2285987169149551214
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7524796207371913740}
+  m_GameObject: {fileID: 1315913948487322307}
   serializedVersion: 2
+<<<<<<< Updated upstream
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+=======
+  m_LocalRotation: {x: -0.035740476, y: 0.96762717, z: -0.092074856, w: 0.23225546}
+  m_LocalPosition: {x: 84.612335, y: -3.730587, z: 30.907166}
+  m_LocalScale: {x: 0.6539961, y: 0.65399617, z: 0.65399605}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3162112441146912422}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4770392287909034138
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3497136090728557211}
+  m_Layer: 0
+  m_Name: DroneSpawn5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3497136090728557211
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4770392287909034138}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.6611066, y: 0.2673174, z: -0.27383927, w: -0.6453616}
+  m_LocalPosition: {x: 96.744446, y: 2.0440216, z: 53.48532}
+  m_LocalScale: {x: 0.6539961, y: 0.6539961, z: 0.65399593}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3162112441146912422}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7583784946715502110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1387774317169527364}
+  m_Layer: 0
+  m_Name: DroneSpawn2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1387774317169527364
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7583784946715502110}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.38268337, z: -0, w: -0.9238796}
+  m_LocalPosition: {x: 59.59311, y: 0.08022308, z: 42.819305}
+  m_LocalScale: {x: 0.65399617, y: 0.6539961, z: 0.65399617}
+>>>>>>> Stashed changes
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3162112441146912422}
@@ -230,6 +318,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3162112441146912422}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8074198687440964541
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3899231192677052227}
+  m_Layer: 0
+  m_Name: DroneSpawn4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3899231192677052227
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8074198687440964541}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.08521102, y: 0.6791933, z: -0.06895146, w: 0.7257281}
+  m_LocalPosition: {x: 97.92523, y: 2.5325623, z: 54.490356}
+  m_LocalScale: {x: 0.6539962, y: 0.65399605, z: 0.65399617}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3162112441146912422}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8670805842048655206
 GameObject:
   m_ObjectHideFlags: 0
@@ -257,6 +376,37 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3162112441146912422}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8849673237994804989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7156539705943669716}
+  m_Layer: 0
+  m_Name: DroneSpawn1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7156539705943669716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8849673237994804989}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.9238796, z: -0, w: 0.38268325}
+  m_LocalPosition: {x: 94.14938, y: -1.665947, z: 60.208466}
+  m_LocalScale: {x: 0.65399617, y: 0.6539961, z: 0.65399617}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3162112441146912422}
