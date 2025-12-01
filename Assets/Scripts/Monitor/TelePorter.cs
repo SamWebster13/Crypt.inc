@@ -4,9 +4,9 @@ using UnityEngine;
 public class TVScreenTeleporter : MonoBehaviour
 {
     [Header("Refs")]
-    public TVScreenController tv;          // Drag your TV here
-    public Transform[] arrivalPoints;      // Optional: per-camera arrival markers
-    public Spawner spawner;                // Reference to your drone spawner
+    public TVScreenController tv;
+    public Transform[] arrivalPoints;
+    public Spawner spawner;
 
     [Header("Defaults")]
     public float forwardOffset = 1.2f;
@@ -15,7 +15,7 @@ public class TVScreenTeleporter : MonoBehaviour
     public float snapDownDistance = 3f;
 
     [Header("Gating")]
-    public bool requirePowerOn = true;     // Only works when TV is on
+    public bool requirePowerOn = true;
 
     Collider col;
 
@@ -29,18 +29,16 @@ public class TVScreenTeleporter : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        // 1) Teleport player
+        // Teleport the player
         Warp(other.transform);
 
-        // 2) Update drone spawn points
-        ActivateDroneSpawnPoints();
+        // Optional: for debugging/visuals, we can highlight the current camera's drone spawn point
+        // ActivateDroneSpawnPoints();
     }
 
-    // --- Player teleport logic (unchanged) ---
     public void Warp(Transform playerRoot)
     {
         if (!tv || tv.SourceCount == 0) return;
-        if (requirePowerOn && !tv.IsOn) return;
 
         Camera cam = tv.sources[tv.ActiveIndex];
         if (!cam) return;
@@ -48,6 +46,7 @@ public class TVScreenTeleporter : MonoBehaviour
         Vector3 dstPos;
         Quaternion dstRot;
 
+        // Optional arrival point per camera
         if (arrivalPoints != null &&
             tv.ActiveIndex < arrivalPoints.Length &&
             arrivalPoints[tv.ActiveIndex] != null)
@@ -64,6 +63,7 @@ public class TVScreenTeleporter : MonoBehaviour
                 : cT.rotation;
         }
 
+        // Snap to ground
         if (Physics.Raycast(dstPos + Vector3.up, Vector3.down, out var hit, snapDownDistance + 1f, groundMask))
             dstPos = hit.point;
 
@@ -80,19 +80,18 @@ public class TVScreenTeleporter : MonoBehaviour
         }
     }
 
-    // --- NEW: Activate drone spawn points for current camera ---
     void ActivateDroneSpawnPoints()
     {
         if (spawner == null || spawner.droneSpawnPoints.Length == 0) return;
 
-        // Deactivate all points first
+        // Disable all spawn points
         foreach (var point in spawner.droneSpawnPoints)
         {
             if (point != null)
                 point.gameObject.SetActive(false);
         }
 
-        // Activate only the point corresponding to the active camera
+        // Enable spawn point for active camera
         int camIndex = tv.ActiveIndex;
         if (camIndex < spawner.droneSpawnPoints.Length && spawner.droneSpawnPoints[camIndex] != null)
         {

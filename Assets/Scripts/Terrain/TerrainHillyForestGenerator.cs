@@ -174,13 +174,22 @@ public class TerrainHillyForestGenerator : MonoBehaviour
         data = new TerrainData();
         data.heightmapResolution = Mathf.Max(heightmapResolution.x, heightmapResolution.y);
         data.size = terrainSize;
+
         terrain.terrainData = data;
+
+        // ★ NEW: keep collider in sync
+        var terrainCollider = GetComponent<TerrainCollider>();
+        if (terrainCollider != null)
+        {
+            terrainCollider.terrainData = data;
+        }
 
 #if UNITY_EDITOR
         UnityEditor.AssetDatabase.CreateAsset(data, GetUniquePath("Assets/GeneratedTerrain.asset"));
         UnityEditor.AssetDatabase.SaveAssets();
 #endif
     }
+
 
 #if UNITY_EDITOR
     string GetUniquePath(string basePath)

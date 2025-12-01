@@ -36,7 +36,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4885164474699141258}
-  - {fileID: 9096635924145953907}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1156535924984073971
@@ -343,14 +342,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2849575185548584489}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4287603, y: -0, z: -0, w: 0.90341836}
-  m_LocalPosition: {x: 0.018, y: -0.03, z: 0.835}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.018005371, y: -0.288, z: 1.016}
   m_LocalScale: {x: 0.70331556, y: 0.49793, z: 0.22377}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5928491665272970106}
-  m_Father: {fileID: 3169948662624445101}
-  m_LocalEulerAnglesHint: {x: 50.778, y: 0, z: 0}
+  m_Father: {fileID: 2010279107673666561}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4033936340014355970
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -452,7 +451,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3260167559215544984}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -460,7 +459,7 @@ Transform:
   - {fileID: 7563453501873747376}
   - {fileID: 3646574390796418327}
   - {fileID: 1181326014938166884}
-  m_Father: {fileID: 4885164474699141258}
+  m_Father: {fileID: 2010279107673666561}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4164437441017823186
 GameObject:
@@ -623,7 +622,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7713363278644326075}
+  - {fileID: 2010279107673666561}
   m_Father: {fileID: 3169948662624445101}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &4657795231356096122
@@ -911,6 +910,7 @@ MonoBehaviour:
   arrivalPoints:
   - {fileID: 0}
   - {fileID: 0}
+  spawner: {fileID: 0}
   forwardOffset: 1.2
   matchCameraYawOnly: 1
   groundMask:
@@ -931,6 +931,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TVPowerDrainer
   drainWhenOn: 2
+--- !u!1 &8502558797719378509
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2010279107673666561}
+  m_Layer: 0
+  m_Name: Tools
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2010279107673666561
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8502558797719378509}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7713363278644326075}
+  - {fileID: 9096635924145953907}
+  m_Father: {fileID: 4885164474699141258}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8970465601230992273
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,6 +8,12 @@ public class FlashlightToggle : MonoBehaviour
     [Header("Key to toggle")]
     public KeyCode toggleKey = KeyCode.F;
 
+    void Start()
+    {
+        if (flashlight != null)
+            flashlight.SetActive(false); 
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(toggleKey) && flashlight != null)

@@ -12,7 +12,10 @@ public class Spawner : MonoBehaviour
 
     [Header("Spawn Points")]  
     public Transform[] enemySpawnPoints;  
-    public Transform[] droneSpawnPoints;  // Only active ones will be used
+    public Transform[] droneSpawnPoints;
+
+    [Header("TV Reference")]
+    public TVScreenController tv;
 
     public ObjectPool enemyPool;  
     public ObjectPool dronePool;  
@@ -28,19 +31,17 @@ public class Spawner : MonoBehaviour
     {  
         if (cycle != null)  
         {  
-            cycle.onSunrise.AddListener(KillAllEnemies); // clear enemies at day  
+            cycle.onSunrise.AddListener(KillAllEnemies);  
         }  
     }  
 
-    void Update()  
-    {  
-        if (cycle != null && cycle.isNight)  
-        {  
-            HandleEnemySpawning();  
-        }  
-
-        HandleDroneSpawning();  
-    }  
+    // void Update()  
+    // {  
+    //     if (cycle != null && cycle.isNight)  
+    //     {  
+    //         HandleEnemySpawning();  
+    //     }  
+    // }  
 
     void HandleEnemySpawning()  
     {  
@@ -53,15 +54,6 @@ public class Spawner : MonoBehaviour
         }  
     }  
 
-    void HandleDroneSpawning()  
-    {  
-        // Spawn drones on input for testing, or you can call this automatically
-        if (Input.GetKeyDown(KeyCode.F))  
-        {  
-            SpawnDrone();  
-        }  
-    }  
-
     public GameObject SpawnEnemy()  
     {  
         if (enemySpawnPoints.Length == 0) return null;  
@@ -69,21 +61,18 @@ public class Spawner : MonoBehaviour
         Transform point = enemySpawnPoints[Random.Range(0, enemySpawnPoints.Length)];  
         GameObject enemy = enemyPool.Get(point.position, point.rotation);  
 
-        enemy.tag = "Enemy";  
         return enemy;  
     }  
 
     public GameObject SpawnDrone()  
     {  
-        // Only use active drone spawn points
-        Transform[] activePoints = System.Array.FindAll(droneSpawnPoints, p => p != null && p.gameObject.activeInHierarchy);
+        Transform[] activePoints =
+            System.Array.FindAll(droneSpawnPoints, p => p != null && p.gameObject.activeInHierarchy);
 
         if (activePoints.Length == 0) return null;  
 
         Transform point = activePoints[Random.Range(0, activePoints.Length)];  
         GameObject drone = dronePool.Get(point.position, point.rotation);  
-
-        drone.tag = "Drone";  
 
         return drone;  
     }  
@@ -109,4 +98,37 @@ public class Spawner : MonoBehaviour
 
         return pool;  
     }  
+
+    public GameObject SpawnDroneForCamera(int cameraIndex)
+    {
+        if (droneSpawnPoints.Length == 0) return null;
+
+        // Ensure index is valid
+        if (cameraIndex < 0 || cameraIndex >= droneSpawnPoints.Length) return null;
+
+        Transform point = droneSpawnPoints[cameraIndex];
+        if (point == null) return null;
+
+        GameObject drone = dronePool.Get(point.position, point.rotation);
+        return drone;
+    }
+
+
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (tv != null)
+            {
+                SpawnDroneForCamera(tv.ActiveIndex);
+            }
+        }
+
+        if (cycle != null && cycle.isNight)
+        {
+            HandleEnemySpawning();
+        }
+    }
 }
+
