@@ -223,7 +223,7 @@ Camera:
   m_GameObject: {fileID: 366948465}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -620,7 +620,7 @@ GameObject:
   - component: {fileID: 1558925284}
   - component: {fileID: 1558925286}
   m_Layer: 0
-  m_Name: Directional Light
+  m_Name: The sun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -699,13 +699,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1558925283}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.61902374, y: -0.19868432, z: 0.16586688, w: 0.7415001}
+  m_LocalRotation: {x: 0.87462974, y: 0.109838195, z: 0.23435639, w: -0.40992138}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 79.712, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 230.22299, y: -30, z: 0}
 --- !u!114 &1558925286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -723,7 +723,7 @@ MonoBehaviour:
   m_CustomShadowLayers: 0
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 0
+  m_SoftShadowQuality: 1
   m_RenderingLayersMask:
     serializedVersion: 0
     m_Bits: 1
@@ -1229,6 +1229,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: night spawning
       objectReference: {fileID: 0}
+    - target: {fileID: 6036061182415626920, guid: a11802f7465d6c64eb036f15c041c74e, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 7428436295805126684, guid: a11802f7465d6c64eb036f15c041c74e, type: 3}
       propertyPath: cycle
       value: 
@@ -1254,17 +1258,29 @@ PrefabInstance:
       propertyPath: m_Name
       value: day/night
       objectReference: {fileID: 0}
+    - target: {fileID: 3773693488014807943, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 7330802011113850189, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: daySpeed
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7330802011113850189, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
+      propertyPath: sunLight
+      value: 
+      objectReference: {fileID: 1558925284}
+    - target: {fileID: 7330802011113850189, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7330802011113850189, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
+      propertyPath: moonLight
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7330802011113850189, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: timeOfDay
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7330802011113850189, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: directionalLight
@@ -1276,7 +1292,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7330802011113850189, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: totalDefaultCycleLength
-      value: 60
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7330802011113850189, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: skyboxExposure.m_PostInfinity
@@ -1404,23 +1420,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8871283668848583745, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.24619833
       objectReference: {fileID: 0}
     - target: {fileID: 8871283668848583745, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.96921945
       objectReference: {fileID: 0}
     - target: {fileID: 8871283668848583745, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 8871283668848583745, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 8871283668848583745, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 208.505
       objectReference: {fileID: 0}
     - target: {fileID: 8871283668848583745, guid: a2d2caad190301c4f93b5bec6cfd294a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
