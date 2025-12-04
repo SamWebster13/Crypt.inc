@@ -165,12 +165,12 @@ public class DayNightCycle : MonoBehaviour
         directionalLight.color = currentSunColor;
 
         // Sun intensity
-        float targetIntensity = night ? 0f : lightIntensity.Evaluate(t);
+        float targetIntensity = night ? 0.2f : lightIntensity.Evaluate(t);
         currentSunIntensity = Mathf.Lerp(currentSunIntensity, targetIntensity, Time.deltaTime * 2f);
         directionalLight.intensity = currentSunIntensity;
 
         // Skybox exposure
-        float targetExposure = night ? 0f : skyboxExposure.Evaluate(t);
+        float targetExposure = night ? 0.2f : skyboxExposure.Evaluate(t);
         currentExposure = Mathf.Lerp(currentExposure, targetExposure, Time.deltaTime * 2f);
 
         if (skyboxMaterial)
