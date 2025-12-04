@@ -123,15 +123,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    - _Exposure: 0.15531747
-=======
-    - _Exposure: 0.13581425
->>>>>>> Stashed changes
-=======
-    - _Exposure: 0.13581425
->>>>>>> Stashed changes
+    - _Exposure: 0.10222666
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
